@@ -2,6 +2,7 @@ module Magnus
 
 abstract Exponentiator
 
+include("scalar.jl")
 include("pade.jl")
 include("lanczos.jl")
 include("propagators.jl")
