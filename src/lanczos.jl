@@ -8,7 +8,7 @@ type LanczosExponentiator{T<:AbstractFloat,U<:Number} <: Exponentiator
     β::Vector{T}
     tmp::Vector{U}
 end
-function LanczosExponentiator{U<:Number}(m::Integer, v::StridedVector{U})
+function LanczosExponentiator{U<:Number}(m::Integer, v::StridedArray{U})
     M = length(v)
     V = zeros(U, M, m + 1)
     α = zeros(real(U), m)
@@ -19,7 +19,7 @@ end
 import Base: call
 call(LE::LanczosExponentiator,
      Ω::AbstractLinearOperator, τ::Number,
-     v::StridedVector, w::StridedVector) =
+     v::StridedArray, w::StridedArray) =
          exp_lanczos!(Ω, v, τ, LE.m, w, LE.V, LE.α, LE.β)
 
 export LanczosExponentiator, call

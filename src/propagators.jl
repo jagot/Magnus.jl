@@ -14,7 +14,8 @@ MidpointPropagator{E<:Exponentiator}(A::Function, Exp::E) =
 
 call{E<:Exponentiator}(p::MidpointPropagator{E},
                        t::Real, τ::Real,
-                       v::StridedVector, w::StridedVector) = p.Exp(p.A(t+τ/2), p.a*τ, v, w)
+                       v::StridedArray, w::StridedArray) =
+                           p.Exp(p.A(t+τ/2), p.a*τ, v, w)
 
 
 export MagnusPropagator, MidpointPropagator
