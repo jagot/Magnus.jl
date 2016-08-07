@@ -10,5 +10,6 @@ include("scalar.jl")
 include("sub_exp.jl")
 include("lanczos.jl")
 include("propagators.jl")
+include("integrate.jl")
 
 end # module

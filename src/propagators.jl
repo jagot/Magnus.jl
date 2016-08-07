@@ -12,7 +12,7 @@ MidpointPropagator{E<:Exponentiator}(A::Function, Exp::E) =
 
 call{E<:Exponentiator}(p::MidpointPropagator{E},
                        t::Real, τ::Real,
-                       v::StridedArray, w::StridedArray) =
+                       v::KindOfVector, w::KindOfVector) =
                            p.Exp(p.A(t+τ/2), p.a*τ, v, w)
 
 #=
@@ -41,7 +41,7 @@ CFET4BfCPropagator{E<:Exponentiator}(B::LinOp,
 
 function call{E<:Exponentiator}(p::CFET4BfCPropagator{E},
                                 t::Real, τ::Real,
-                                v::StridedArray, w::StridedArray)
+                                v::KindOfVector, w::KindOfVector)
     h1 = 37/66 - 400/957*sqrt(5/3)
     h2 = -4/33
     h3 = 37/66 + 400/957*sqrt(5/3)
