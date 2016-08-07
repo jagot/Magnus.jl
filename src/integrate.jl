@@ -45,7 +45,7 @@ function integrate(observe::Function,
         verbose && ProgressMeter.update!(prog, i)
     end
     ms = toq()*1000
-    verbose && println("Grid points/ms: ", SI(length(V)*steps/ms))
+    verbose && println("Grid points/ms: ", SI(length(v₀)*steps/ms))
     V
 end
 
