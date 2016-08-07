@@ -1,4 +1,4 @@
-using LinearOperators
+using LinOps
 using Magnus
 
 using PyCall
@@ -81,12 +81,12 @@ M = 50
 T,ei,x = particle_in_box(M)
 psi0,E0 = state(ei, [1])
 
-H₀ = LinearOperator(T)
+H₀ = LinOp(sparse(T))
 F₀ = 1e4
 period = 1.0/abs(ei[:values][1]-ei[:values][2])
 ω = 2π/4
 mx = Diagonal(collect(x-mean(x)))
-D = LinearOperator(mx, symmetric=true, hermitian=true)
+D = LinOp(sparse(mx))
 tmax = 50
 field = t -> F₀*exp(-(t-tmax/2).^2/2dt^2).*sin(ω*t)
 F = t -> field(t*period)
