@@ -1,5 +1,3 @@
-using LinearOperators
-
 import Base: call
 
 abstract MagnusPropagator{E<:Exponentiator}
@@ -29,15 +27,15 @@ described in
 
 =#
 type CFET4BfCPropagator{E<:Exponentiator} <: MagnusPropagator{E}
-    B::LinearOperator
+    B::LinOp
     f::Function
-    C::LinearOperator
+    C::LinOp
     a::Number
     Exp::E
 end
-CFET4BfCPropagator{E<:Exponentiator}(B::LinearOperator,
+CFET4BfCPropagator{E<:Exponentiator}(B::LinOp,
                                      f::Function,
-                                     C::LinearOperator,
+                                     C::LinOp,
                                      Exp::E) =
                                          CFET4BfCPropagator(B, f, C, 1, Exp)
 

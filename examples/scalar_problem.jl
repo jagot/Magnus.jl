@@ -1,4 +1,4 @@
-using LinearOperators
+using LinOps
 using Magnus
 
 using PyCall
@@ -35,13 +35,13 @@ function test_convergence(propagator::MagnusPropagator, exact, Na, Nb, subs, lab
     subplot(subs[1])
     plot(Ns, errors, ".-", label = label)
     subplot(subs[2])
-    plot(Ns, times, ".-", label = label)
+    plot(errors, times, ".-", label = label)
 end
 
-b = -1
+b = -1.
 ω = 2π
 f = t -> sin(ω*t)
-c = 10
+c = 10.
 y0 = [1.0]
 
 tmax = π
@@ -58,12 +58,9 @@ function plot_approx(t_approx,y_approx,subs,label)
     semilogy(t_approx, abs(y_approx-y), st, label=label)
 end
 
-import LinearOperators: LinearOperator
-LinearOperator{T<:Number}(t::T) = LinearOperator(1, T, v -> t*v)
 Exp = ScalarExponentiator(y0)
-
-midpoint = MidpointPropagator(t -> LinearOperator(b + f(t)*c), -1, Exp)
-cfet = CFET4BfCPropagator(LinearOperator(b), f, LinearOperator(c), -1, Exp)
+midpoint = MidpointPropagator(t -> LinOp(b + f(t)*c), -1, Exp)
+cfet = CFET4BfCPropagator(LinOp(b), f, LinOp(c), -1, Exp)
 
 figure("scalar",figsize=(10,14))
 clf()
@@ -101,8 +98,7 @@ gca()[:set_xticklabels]([])
 subplot(414)
 xscale("log")
 yscale("log")
-xlabel(L"N")
+xlabel("Error")
 ylabel("Execution time [s]")
+legend()
 tight_layout()
-
-show()
