@@ -30,8 +30,8 @@ function exp_lanczos!{T<:Number, R<:Real}(A::LinOp,
         x,y = sub(V,:,j),sub(V,:,j+1)
         A(y,x)
         α[j] = real(vecdot(x,y))
-        j > 1 && axpy!(complex(-β[j-1]), sub(V,:,j-1), y)
-        axpy!(complex(-α[j]), x, y)
+        j > 1 && axpy!(T(-β[j-1]), sub(V,:,j-1), y)
+        axpy!(T(-α[j]), x, y)
         β[j] = norm(y)
         scale!(y, 1.0/β[j])
 
@@ -47,7 +47,7 @@ function exp_lanczos!{T<:Number, R<:Real}(A::LinOp,
     end
     verbose && println("Krylov subspace size: ", jj)
     copy!(d_sub_v, sub_v)
-    A_mul_B!(complex(β₀), sub(V,:,1:jj),
+    A_mul_B!(T(β₀), sub(V,:,1:jj),
              sub(d_sub_v, 1:jj),
              zero(T), vp)
 end
