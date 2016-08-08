@@ -22,28 +22,13 @@ function state(ei, c::Vector, t::Real = 0)
     psi,E
 end
 
-function propagate{T<:AbstractFloat}(ψ₀::AbstractVector{Complex{T}},
-                                     tmax::Number, N::Integer,
-                                     propagator::MagnusPropagator,
-                                     save::Bool = false)
-    τ = tmax/N
-    Ψ = save ? Matrix{Complex{T}}(length(ψ₀),N+1) : Vector{Complex{T}}(length(ψ₀))
-    Ψ[:,1] = ψ₀
-    cur = 1
-    next = save ? 2 : 1
-    for i = 1:N
-        propagator((i-1)*τ, τ, sub(Ψ, :, cur), sub(Ψ, :, next))
-        cur = next
-        save && (next += 1)
-    end
-    Ψ
-end
 
 function test_propagation(name, psi0, tmax, period, N, propagator)
-    @time psi = propagate(psi0,
+    @time psi = integrate(psi0,
                           tmax*period, N,
-                          propagator,
-                          true)
+                          propagator;
+                          save_intermediate = true,
+                          verbose = true)
     t = linspace(0,tmax,N+1)
     n = Vector{Float64}(length(t))
     p = Vector{Complex128}(length(t))
@@ -93,10 +78,11 @@ F = t -> field(t*period)
 Hᵢ = t -> F(t)*D
 H = t -> H₀ + Hᵢ(t)
 
+midpoint = MidpointPropagator(H, -im, LanczosExponentiator(30,psi0))
+cfet = CFET4BfCPropagator(H₀, F, D, -im, LanczosExponentiator(30,psi0))
+
 ndt = 300
 dt = 6
 
-test_propagation("midpoint", psi0, tmax, period, tmax*300,
-                 MidpointPropagator(H, -im, LanczosExponentiator(30,psi0)))
-test_propagation("CFET", psi0, tmax, period, tmax*30,
-                 CFET4BfCPropagator(H₀, F, D, -im, LanczosExponentiator(30,psi0)))
+test_propagation("midpoint", psi0, tmax, period, tmax*300, midpoint)
+test_propagation("CFET", psi0, tmax, period, tmax*30, cfet)
