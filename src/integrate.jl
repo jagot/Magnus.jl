@@ -55,6 +55,7 @@ integrate(v₀::KindOfVector,
           save_intermediate::Bool = false,
           verbose::Bool = false) =
               integrate((V,i,τ) -> (),
+                        v₀,
                         tmax, steps, propagator;
                         save_intermediate = save_intermediate,
                         verbose = verbose)
