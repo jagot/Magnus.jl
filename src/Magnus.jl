@@ -10,6 +10,8 @@ include("scalar.jl")
 include("sub_exp.jl")
 include("lanczos.jl")
 include("propagators.jl")
+include("midpoint.jl")
+include("cfet.jl")
 include("integrate.jl")
 include("convergence.jl")
 
