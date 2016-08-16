@@ -1,7 +1,7 @@
 KindOfVector = LinOps.KindOfVector
 KindOfMatrix = LinOps.KindOfMatrix
 
-import LinOps: axpy!, A_mul_B!
+import LinOps: axpy!, A_mul_B!, norm
 
 function exp_lanczos!{T<:Number, R<:Real}(A::LinOp,
                                           v::KindOfVector,
