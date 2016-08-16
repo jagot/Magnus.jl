@@ -9,6 +9,12 @@ type MidpointPropagator{E<:Exponentiator} <: MagnusPropagator{E}
 end
 MidpointPropagator{E<:Exponentiator}(A::Function, Exp::E) =
     MidpointPropagator(A, 1, Exp)
+MidpointPropagator{E<:Exponentiator}(B::LinOp,
+                                     f::Function,
+                                     C::LinOp,
+                                     a::Number,
+                                     Exp::E) =
+                                         MidpointPropagator(t -> B + f(t)*C, a, Exp)
 
 call{E<:Exponentiator}(p::MidpointPropagator{E},
                        t::Real, τ::Real,
