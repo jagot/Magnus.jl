@@ -1,3 +1,3 @@
-abstract MagnusPropagator{E<:Exponentiator}
+abstract MagnusPropagator
 
 export MagnusPropagator

@@ -1,6 +1,6 @@
 import Base: call
 
-type MidpointPropagator{E<:Exponentiator} <: MagnusPropagator{E}
+type MidpointPropagator{E<:Exponentiator} <: MagnusPropagator
     A::Function
     a::Number
     Exp::E

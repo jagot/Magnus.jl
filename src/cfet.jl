@@ -11,7 +11,7 @@ described in
   105008. http://dx.doi.org/10.1088/1367-2630/14/10/105008
 
 =#
-type CFET4BfCPropagator{E<:Exponentiator} <: MagnusPropagator{E}
+type CFET4BfCPropagator{E<:Exponentiator} <: MagnusPropagator
     B::LinOp
     f::Function
     C::LinOp
