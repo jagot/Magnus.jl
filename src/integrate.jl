@@ -92,15 +92,13 @@ function integrate(observe::Function,
         error("Unknown exponentiator, $(string(exponentiator))")
     end
 
-    propagator_t = if propagator == :cfet
-        CFET4BfCPropagator
+    propagator = if propagator == :cfet
+        CFET4BfCPropagator(B, f, C, a, Exp)
     elseif propagator == :midpoint
-        MidpointPropagator
+        MidpointPropagator(t -> B + f(t)*C, a, Exp)
     else
         error("Unknown propagator, $(string(propagator))")
     end
-
-    propagator = propagator_t(B, f, C, a, Exp)
 
     V = integrate(observe,
                   v₀,

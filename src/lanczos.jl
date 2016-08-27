@@ -18,7 +18,7 @@ function exp_lanczos!{T<:Number, R<:Real}(A::LinOp,
                                           verbose::Bool = false)
     β₀ = norm(v)
     copy!(sub(V,:,1), v)
-    scale!(sub(V,:,1), 1.0/β₀)
+    scale!(sub(V,:,1), one(T)/β₀)
 
     ε = atol + rtol * β₀
     verbose && @printf("Initial norm: β₀ %e, stopping threshold: %e\n", β₀, ε)
@@ -33,7 +33,7 @@ function exp_lanczos!{T<:Number, R<:Real}(A::LinOp,
         j > 1 && axpy!(T(-β[j-1]), sub(V,:,j-1), y)
         axpy!(T(-α[j]), x, y)
         β[j] = norm(y)
-        scale!(y, 1.0/β[j])
+        scale!(y, one(T)/β[j])
 
         expT(sub(α, 1:jj), sub(β, 1:jj-1), τ, sub(sub_v, 1:j), sw)
         σ = β[j]*abs(sub_v[j])
@@ -69,6 +69,7 @@ function LanczosExponentiator(m::Integer, v::KindOfVector;
                               rtol::Float64 = 1.0e-4,
                               verbose::Bool = false)
     U = eltype(v)
+    T = real(U)
     N = length(v)
     V = similar(v, U, N, m + 1)
     α = Array(real(U), m)
@@ -77,7 +78,7 @@ function LanczosExponentiator(m::Integer, v::KindOfVector;
     d_sub_v = similar(v, U, m)
     LanczosExponentiator(m, V, α, β, sub_v, d_sub_v,
                          stegr_work(real(U), BlasInt(m)),
-                         atol, rtol, verbose)
+                         T(atol), T(rtol), verbose)
 end
 
 import Base: call

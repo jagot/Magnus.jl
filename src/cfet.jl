@@ -24,25 +24,26 @@ CFET4BfCPropagator{E<:Exponentiator}(B::LinOp,
                                      Exp::E) =
                                          CFET4BfCPropagator(B, f, C, 1, Exp)
 
-function call{E<:Exponentiator}(p::CFET4BfCPropagator{E},
-                                t::Real, τ::Real,
+function call{E<:Exponentiator,
+              T<:AbstractFloat}(p::CFET4BfCPropagator{E},
+                                t::T, τ::T,
                                 v::KindOfVector, w::KindOfVector)
-    h1 = 37/66 - 400/957*sqrt(5/3)
-    h2 = -4/33
-    h3 = 37/66 + 400/957*sqrt(5/3)
-    h4 = -11/162
-    h5 = 92/81
+    h1 = T(37/66 - 400/957*sqrt(5/3))
+    h2 = T(-4/33)
+    h3 = T(37/66 + 400/957*sqrt(5/3))
+    h4 = T(-11/162)
+    h5 = T(92/81)
 
-    ff1 = p.f(t + (1/2-sqrt(3/20))*τ)
-    ff2 = p.f(t + 1/2*τ)
-    ff3 = p.f(t + (1/2+sqrt(3/20))*τ)
+    ff1 = p.f(t + T(1/2-sqrt(3/20))*τ)
+    ff2 = p.f(t + τ/2)
+    ff3 = p.f(t + T(1/2+sqrt(3/20))*τ)
 
     f1 = h1*ff1 + h2*ff2 + h3*ff3
     f2 = h4*ff1 + h5*ff2 + h4*ff3
     f3 = h3*ff1 + h2*ff2 + h1*ff3
 
-    τ1 = 11/40*τ
-    τ2 = 9/20*τ
+    τ1 = 11τ/40
+    τ2 = 9τ/20
 
     p.Exp(p.B + f3*p.C, p.a*τ1, v, w)
     p.Exp(p.B + f2*p.C, p.a*τ2, w, w)
