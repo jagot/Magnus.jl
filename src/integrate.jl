@@ -74,6 +74,7 @@ function integrate(observe::Function,
                    verbose::Bool = false)
     if mode == :gpu
         !cuda && error("Cuda not available, gpu integration impossible")
+        verbose && println("Active device: $(CUDArt.name(CUDArt.device_properties(device())))")
         v₀ = CudaArray(v₀)
         B = upload(B)
         C = upload(C)
