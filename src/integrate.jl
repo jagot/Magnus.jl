@@ -5,8 +5,6 @@ const cuda = if Pkg.installed("CUDArt") != nothing
     using CUDArt
     using CUBLAS
     using CUSPARSE
-    upload(A::AbstractSparseMatrix) = CudaSparseMatrixCSR(A)
-    upload(A::AbstractMatrix) = CudaArray(A)
     true
 else
     false
