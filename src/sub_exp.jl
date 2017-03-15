@@ -1,4 +1,5 @@
-import Base.LinAlg.BLAS: blasfunc, BlasInt
+import Base.LinAlg.BLAS: @blasfunc
+import Base.LinAlg: BlasInt
 import Base.LinAlg.LAPACK: stegr!
 const liblapack = Base.liblapack_name
 
@@ -27,7 +28,7 @@ for (stegr,elty) in ((:dstegr_,:Float64),
     @eval begin
         function stegr!(n::BlasInt, sw::stegr_work{$elty})
             ldz = stride(sw.Z, 2)
-            ccall(($(blasfunc(stegr)), liblapack), Void,
+            ccall((@blasfunc($stegr), liblapack), Void,
                   (Ptr{UInt8}, Ptr{UInt8}, Ptr{BlasInt}, Ptr{$elty},
                    Ptr{$elty}, Ptr{$elty}, Ptr{$elty}, Ptr{BlasInt},
                    Ptr{BlasInt}, Ptr{$elty}, Ptr{BlasInt}, Ptr{$elty},

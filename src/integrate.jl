@@ -5,8 +5,6 @@ const cuda = if Pkg.installed("CUDArt") != nothing
     using CUDArt
     using CUBLAS
     using CUSPARSE
-    upload(A::AbstractSparseMatrix) = CudaSparseMatrixCSR(A)
-    upload(A::AbstractMatrix) = CudaArray(A)
     true
 else
     false
@@ -47,7 +45,9 @@ function integrate(observe::Function,
     end
     ms = toq()*1000
     verbose && println("Grid points/ms: ", SI(length(v₀)*steps/ms))
-    V
+    Dict(:V => V,
+         :milliseconds => ms,
+         :performance => length(v₀)*steps/ms)
 end
 
 integrate(v₀::KindOfVector,
@@ -76,6 +76,7 @@ function integrate(observe::Function,
                    verbose::Bool = false)
     if mode == :gpu
         !cuda && error("Cuda not available, gpu integration impossible")
+        verbose && println("Active device: $(CUDArt.name(CUDArt.device_properties(device())))")
         v₀ = CudaArray(v₀)
         B = upload(B)
         C = upload(C)
@@ -100,14 +101,16 @@ function integrate(observe::Function,
         error("Unknown propagator, $(string(propagator))")
     end
 
-    V = integrate(observe,
-                  v₀,
-                  tmax, steps, propagator;
-                  save_intermediate = save_intermediate,
-                  verbose = verbose)
-
-    mode == :gpu && (V = to_host(V))
-    V
+    results = integrate(observe,
+                        v₀,
+                        tmax, steps, propagator;
+                        save_intermediate = save_intermediate,
+                        verbose = verbose)
+    if mode == :gpu
+        Dict(results..., :V => to_host(results[:V]))
+    else
+        results
+    end
 end
 
 integrate(v₀::KindOfVector,
