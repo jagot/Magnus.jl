@@ -14,9 +14,8 @@ MidpointPropagator{E<:Exponentiator}(B::LinOp,
                                      Exp::E) =
                                          MidpointPropagator(t -> B + f(t)*C, a, Exp)
 
-call{E<:Exponentiator}(p::MidpointPropagator{E},
-                       t::Real, τ::Real,
-                       v::KindOfVector, w::KindOfVector) =
-                           p.Exp(p.A(t+τ/2), p.a*τ, v, w)
+(p::MidpointPropagator{E}){E<:Exponentiator}(t::Real, τ::Real,
+                                             v::KindOfVector, w::KindOfVector) =
+                                                 p.Exp(p.A(t+τ/2), p.a*τ, v, w)
 
 export MidpointPropagator

@@ -8,12 +8,10 @@ function ScalarExponentiator(v::KindOfVector)
     ScalarExponentiator()
 end
 
-import Base: call
-function call{T<:Number}(SE::ScalarExponentiator,
-                         Ω::LinOp{T}, τ::Number,
-                         v, w)
+function (SE::ScalarExponentiator){T<:Number}(Ω::LinOp{T}, τ::Number,
+                                              v, w)
     a = Ω([one(T)])[1]
     w[:] = exp(τ*a)*v
 end
 
-export ScalarExponentiator, call
+export ScalarExponentiator

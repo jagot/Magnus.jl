@@ -24,10 +24,9 @@ CFET4BfCPropagator{E<:Exponentiator}(B::LinOp,
                                      Exp::E) =
                                          CFET4BfCPropagator(B, f, C, 1, Exp)
 
-function call{E<:Exponentiator,
-              T<:AbstractFloat}(p::CFET4BfCPropagator{E},
-                                t::T, τ::T,
-                                v::KindOfVector, w::KindOfVector)
+function (p::CFET4BfCPropagator{E}){E<:Exponentiator,
+                                    T<:AbstractFloat}(t::T, τ::T,
+                                                      v::KindOfVector, w::KindOfVector)
     h1 = T(37/66 - 400/957*sqrt(5/3))
     h2 = T(-4/33)
     h3 = T(37/66 + 400/957*sqrt(5/3))

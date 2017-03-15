@@ -81,15 +81,14 @@ function LanczosExponentiator(m::Integer, v::KindOfVector;
                          T(atol), T(rtol), verbose)
 end
 
-import Base: call
-call{T<:AbstractFloat,U<:Number}(LE::LanczosExponentiator{T,U},
-     Ω::LinOp, τ::U,
-     v::KindOfVector, w::KindOfVector) = exp_lanczos!(Ω, v, τ, LE.m, w,
-                                                      LE.V, LE.α, LE.β,
-                                                      LE.sub_v, LE.d_sub_v,
-                                                      LE.sw;
-                                                      atol = LE.atol,
-                                                      rtol = LE.rtol,
-                                                      verbose = LE.verbose)
+(LE::LanczosExponentiator{T,U}){T<:AbstractFloat,U<:Number}(Ω::LinOp, τ::U,
+                                                            v::KindOfVector, w::KindOfVector) =
+                                                                exp_lanczos!(Ω, v, τ, LE.m, w,
+                                                                             LE.V, LE.α, LE.β,
+                                                                             LE.sub_v, LE.d_sub_v,
+                                                                             LE.sw;
+                                                                             atol = LE.atol,
+                                                                             rtol = LE.rtol,
+                                                                             verbose = LE.verbose)
 
-export LanczosExponentiator, call
+export LanczosExponentiator
