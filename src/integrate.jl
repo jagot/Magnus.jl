@@ -29,17 +29,17 @@ function integrate(observe::Function,
                    verbose::Bool = false)
     τ = tmax/steps
     V = similar(v₀, eltype(v₀), length(v₀), save_intermediate ? steps + 1 : 1)
-    copy!(sub(V, :, 1), v₀)
+    copy!(view(V, :, 1), v₀)
     cur = 1
     next = save_intermediate ? 2 : 1
     verbose && println("$(typeof(propagator))")
     prog = Progress(steps, 0.1, "Integrating ")
     tic()
     for i = 1:steps
-        propagator((i-1)*τ, τ, sub(V, :, cur), sub(V, :, next))
+        propagator((i-1)*τ, τ, view(V, :, cur), view(V, :, next))
 
         cur = next
-        observe(sub(V, :, next), i, τ)
+        observe(view(V, :, next), i, τ)
         save_intermediate && (next += 1)
         verbose && ProgressMeter.update!(prog, i)
     end

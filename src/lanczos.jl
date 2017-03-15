@@ -17,8 +17,8 @@ function exp_lanczos!{T<:Number, R<:Real}(A::LinOp,
                                           rtol::R = 1.0e-4,
                                           verbose::Bool = false)
     β₀ = norm(v)
-    copy!(sub(V,:,1), v)
-    scale!(sub(V,:,1), one(T)/β₀)
+    copy!(view(V,:,1), v)
+    scale!(view(V,:,1), one(T)/β₀)
 
     ε = atol + rtol * β₀
     verbose && @printf("Initial norm: β₀ %e, stopping threshold: %e\n", β₀, ε)
@@ -27,15 +27,15 @@ function exp_lanczos!{T<:Number, R<:Real}(A::LinOp,
     jj = 1 # Which Krylov subspace to use, in the end
 
     for j = 1:m
-        x,y = sub(V,:,j),sub(V,:,j+1)
+        x,y = view(V,:,j),view(V,:,j+1)
         A(y,x)
         α[j] = real(vecdot(x,y))
-        j > 1 && axpy!(T(-β[j-1]), sub(V,:,j-1), y)
+        j > 1 && axpy!(T(-β[j-1]), view(V,:,j-1), y)
         axpy!(T(-α[j]), x, y)
         β[j] = norm(y)
         scale!(y, one(T)/β[j])
 
-        expT(sub(α, 1:jj), sub(β, 1:jj-1), τ, sub(sub_v, 1:j), sw)
+        expT(view(α, 1:jj), view(β, 1:jj-1), τ, view(sub_v, 1:j), sw)
         σ = β[j]*abs(sub_v[j])
         verbose && @printf("iter %d, α[%d] %e, β[%d] %e, σ %e\n",j, j, α[j], j, β[j], σ)
 
@@ -47,8 +47,8 @@ function exp_lanczos!{T<:Number, R<:Real}(A::LinOp,
     end
     verbose && println("Krylov subspace size: ", jj)
     copy!(d_sub_v, sub_v)
-    A_mul_B!(T(β₀), sub(V,:,1:jj),
-             sub(d_sub_v, 1:jj),
+    A_mul_B!(T(β₀), view(V,:,1:jj),
+             view(d_sub_v, 1:jj),
              zero(T), vp)
 end
 
