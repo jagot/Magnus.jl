@@ -1,8 +1,6 @@
 using LinOps
 using Magnus
 
-using PyCall
-pygui(:qt)
 using PyPlot
 
 function particle_in_box(M = 20,L = 1)
@@ -28,7 +26,7 @@ function test_propagation(name, psi0, tmax, period, N, propagator)
                           tmax*period, N,
                           propagator;
                           save_intermediate = true,
-                          verbose = true)
+                          verbose = true)[:V]
     t = linspace(0,tmax,N+1)
     n = Vector{Float64}(length(t))
     p = Vector{Complex128}(length(t))
@@ -58,6 +56,7 @@ function test_propagation(name, psi0, tmax, period, N, propagator)
     ylabel(L"|\Psi|^2")
     a2 = gca()[:twinx]()
     a2[:plot](t,abs(p), "--")
+    margins(0,0.1)
     ylabel(L"|\langle\Psi_0|\Psi\rangle|")
     tight_layout()
 end

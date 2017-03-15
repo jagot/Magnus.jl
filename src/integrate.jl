@@ -5,8 +5,6 @@ const cuda = if Pkg.installed("CUDArt") != nothing
     using CUDArt
     using CUBLAS
     using CUSPARSE
-    upload(A::AbstractSparseMatrix) = CudaSparseMatrixCSR(A)
-    upload(A::AbstractMatrix) = CudaArray(A)
     true
 else
     false
@@ -31,23 +29,25 @@ function integrate(observe::Function,
                    verbose::Bool = false)
     τ = tmax/steps
     V = similar(v₀, eltype(v₀), length(v₀), save_intermediate ? steps + 1 : 1)
-    copy!(sub(V, :, 1), v₀)
+    copy!(view(V, :, 1), v₀)
     cur = 1
     next = save_intermediate ? 2 : 1
     verbose && println("$(typeof(propagator))")
     prog = Progress(steps, 0.1, "Integrating ")
     tic()
     for i = 1:steps
-        propagator((i-1)*τ, τ, sub(V, :, cur), sub(V, :, next))
+        propagator((i-1)*τ, τ, view(V, :, cur), view(V, :, next))
 
         cur = next
-        observe(sub(V, :, next), i, τ)
+        observe(view(V, :, next), i, τ)
         save_intermediate && (next += 1)
         verbose && ProgressMeter.update!(prog, i)
     end
     ms = toq()*1000
     verbose && println("Grid points/ms: ", SI(length(v₀)*steps/ms))
-    V
+    Dict(:V => V,
+         :milliseconds => ms,
+         :performance => length(v₀)*steps/ms)
 end
 
 integrate(v₀::KindOfVector,
@@ -76,6 +76,7 @@ function integrate(observe::Function,
                    verbose::Bool = false)
     if mode == :gpu
         !cuda && error("Cuda not available, gpu integration impossible")
+        verbose && println("Active device: $(CUDArt.name(CUDArt.device_properties(device())))")
         v₀ = CudaArray(v₀)
         B = upload(B)
         C = upload(C)
@@ -100,14 +101,16 @@ function integrate(observe::Function,
         error("Unknown propagator, $(string(propagator))")
     end
 
-    V = integrate(observe,
-                  v₀,
-                  tmax, steps, propagator;
-                  save_intermediate = save_intermediate,
-                  verbose = verbose)
-
-    mode == :gpu && (V = to_host(V))
-    V
+    results = integrate(observe,
+                        v₀,
+                        tmax, steps, propagator;
+                        save_intermediate = save_intermediate,
+                        verbose = verbose)
+    if mode == :gpu
+        Dict(results..., :V => to_host(results[:V]))
+    else
+        results
+    end
 end
 
 integrate(v₀::KindOfVector,

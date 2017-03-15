@@ -9,8 +9,8 @@ function convergence(exact, y0, tmax, Na, Nb, propagator::MagnusPropagator)
     @showprogress for j = eachindex(Ns)
         tic()
         r = integrate(y0, tmax, Ns[j], propagator)
-        times[j] = toq()
-        errors[j] = sqrt(sumabs2(exact-r))
+        times[j] = r[:milliseconds]
+        errors[j] = sqrt(sumabs2(exact-r[:V]))
     end
     Ns,errors,times
 end

@@ -17,8 +17,8 @@ import Base: call
 function call(PE::PadeExponentiator,
               Ω::AbstractLinearOperator, τ::Number,
               v::StridedArray, w::StridedArray)
-    PE.tmp[:,2] = polyval(PE.p, τ*Ω, sub(PE.tmp, :, 1))*v
-    solve!(w, polyval(PE.q, τ*Ω, sub(PE.tmp, :, 1)), PE.tmp[:,2])[1]
+    PE.tmp[:,2] = polyval(PE.p, τ*Ω, view(PE.tmp, :, 1))*v
+    solve!(w, polyval(PE.q, τ*Ω, view(PE.tmp, :, 1)), PE.tmp[:,2])[1]
 end
 
 export PadeExponentiator, call
