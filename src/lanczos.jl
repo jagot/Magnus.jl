@@ -1,17 +1,12 @@
-KindOfVector = LinOps.KindOfVector
-KindOfMatrix = LinOps.KindOfMatrix
-
-import LinOps: axpy!, A_mul_B!, norm
-
-function exp_lanczos!{T<:Number, R<:Real}(A::LinOp,
-                                          v::KindOfVector,
+function exp_lanczos!{T<:Number, R<:Real}(A::LinearMap,
+                                          v::AbstractVector,
                                           τ::T, m::Integer,
-                                          vp::KindOfVector,
-                                          V::KindOfMatrix,
+                                          vp::AbstractVector,
+                                          V::AbstractMatrix,
                                           α::Vector{R},
                                           β::Vector{R},
                                           sub_v::Vector{T},
-                                          d_sub_v::KindOfVector,
+                                          d_sub_v::AbstractVector,
                                           sw::stegr_work;
                                           atol::R = 1.0e-8,
                                           rtol::R = 1.0e-4,
@@ -28,10 +23,10 @@ function exp_lanczos!{T<:Number, R<:Real}(A::LinOp,
 
     for j = 1:m
         x,y = view(V,:,j),view(V,:,j+1)
-        A(y,x)
+        A_mul_B!(y,A,x)
         α[j] = real(vecdot(x,y))
-        j > 1 && axpy!(T(-β[j-1]), view(V,:,j-1), y)
-        axpy!(T(-α[j]), x, y)
+        j > 1 && (y .-= β[j-1]*view(V,:,j-1))
+        y .-= α[j]*x
         β[j] = norm(y)
         scale!(y, one(T)/β[j])
 
@@ -47,24 +42,22 @@ function exp_lanczos!{T<:Number, R<:Real}(A::LinOp,
     end
     verbose && println("Krylov subspace size: ", jj)
     copy!(d_sub_v, sub_v)
-    A_mul_B!(T(β₀), view(V,:,1:jj),
-             view(d_sub_v, 1:jj),
-             zero(T), vp)
+    vp[:] = β₀*view(V,:,1:jj)*view(d_sub_v, 1:jj)
 end
 
 type LanczosExponentiator{T<:AbstractFloat,U<:Number} <: KrylovExponentiator
     m::Integer
-    V::KindOfMatrix
+    V::AbstractMatrix
     α::Vector{T}
     β::Vector{T}
     sub_v::Vector{U}
-    d_sub_v::KindOfVector
+    d_sub_v::AbstractVector
     sw::stegr_work{T}
     atol::T
     rtol::T
     verbose::Bool
 end
-function LanczosExponentiator(m::Integer, v::KindOfVector;
+function LanczosExponentiator(m::Integer, v::AbstractVector;
                               atol::Float64 = 1.0e-8,
                               rtol::Float64 = 1.0e-4,
                               verbose::Bool = false)
@@ -72,17 +65,17 @@ function LanczosExponentiator(m::Integer, v::KindOfVector;
     T = real(U)
     N = length(v)
     V = similar(v, U, N, m + 1)
-    α = Array(real(U), m)
-    β = Array(real(U), m)
-    sub_v = Array(U, m)
+    α = Array{real(U)}(m)
+    β = Array{real(U)}(m)
+    sub_v = Array{U}(m)
     d_sub_v = similar(v, U, m)
     LanczosExponentiator(m, V, α, β, sub_v, d_sub_v,
                          stegr_work(real(U), BlasInt(m)),
                          T(atol), T(rtol), verbose)
 end
 
-(LE::LanczosExponentiator{T,U}){T<:AbstractFloat,U<:Number}(Ω::LinOp, τ::U,
-                                                            v::KindOfVector, w::KindOfVector) =
+(LE::LanczosExponentiator{T,U}){T<:AbstractFloat,U<:Number}(Ω::LinearMap, τ::U,
+                                                            v::AbstractVector, w::AbstractVector) =
                                                                 exp_lanczos!(Ω, v, τ, LE.m, w,
                                                                              LE.V, LE.α, LE.β,
                                                                              LE.sub_v, LE.d_sub_v,

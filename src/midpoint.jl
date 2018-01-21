@@ -1,21 +1,19 @@
-import Base: call
-
-type MidpointPropagator{E<:Exponentiator} <: MagnusPropagator
+struct MidpointPropagator{E<:Exponentiator} <: MagnusPropagator
     A::Function
     a::Number
     Exp::E
 end
 MidpointPropagator{E<:Exponentiator}(A::Function, Exp::E) =
     MidpointPropagator(A, 1, Exp)
-MidpointPropagator{E<:Exponentiator}(B::LinOp,
+MidpointPropagator{E<:Exponentiator}(B::LinearMap,
                                      f::Function,
-                                     C::LinOp,
+                                     C::LinearMap,
                                      a::Number,
                                      Exp::E) =
                                          MidpointPropagator(t -> B + f(t)*C, a, Exp)
 
 (p::MidpointPropagator{E}){E<:Exponentiator}(t::Real, τ::Real,
-                                             v::KindOfVector, w::KindOfVector) =
+                                             v::AbstractVector, w::AbstractVector) =
                                                  p.Exp(p.A(t+τ/2), p.a*τ, v, w)
 
 export MidpointPropagator

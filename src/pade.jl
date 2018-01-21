@@ -13,12 +13,10 @@ function PadeExponentiator{T<:Number}(m::Integer, n::Integer,
     PadeExponentiator(pade.p, pade.q, Matrix{eltype(v)}(length(v), 2))
 end
 
-import Base: call
-function call(PE::PadeExponentiator,
-              Ω::AbstractLinearOperator, τ::Number,
-              v::StridedArray, w::StridedArray)
+function (PE::PadeExponentiator)(Ω::AbstractLinearOperator, τ::Number,
+                                 v::StridedArray, w::StridedArray)
     PE.tmp[:,2] = polyval(PE.p, τ*Ω, view(PE.tmp, :, 1))*v
     solve!(w, polyval(PE.q, τ*Ω, view(PE.tmp, :, 1)), PE.tmp[:,2])[1]
 end
 
-export PadeExponentiator, call
+export PadeExponentiator

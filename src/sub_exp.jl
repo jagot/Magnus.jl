@@ -47,19 +47,19 @@ end
 
 function stegr_work(T::DataType, n::BlasInt,
                     jobz::Char = 'V', range::Char = 'A')
-    dv = Array(T, n)
-    ev = Array(T, n)
-    abstol = Array(T, 1)
+    dv = Array{T}(n)
+    ev = Array{T}(n)
+    abstol = Array{T}(1)
     m = Vector{BlasInt}(1)
-    w = Array(T, n)
+    w = Array{T}(n)
     ldz = jobz == 'N' ? 1 : n
-    Z = Array(T, ldz, n)
+    Z = Array{T}(ldz, n)
     isuppz = Array{BlasInt}(2n)
-    work = Array(T, 1)
+    work = Array{T}(1)
     lwork = -one(BlasInt)
     iwork = Array{BlasInt}(1)
     liwork = -one(BlasInt)
-    info = Array(BlasInt, 1)
+    info = Array{BlasInt}(1)
     sw = stegr_work(jobz, range,
                     dv, ev,
                     0.0, 0.0,
@@ -72,9 +72,9 @@ function stegr_work(T::DataType, n::BlasInt,
                     info)
     stegr!(n, sw)
     sw.lwork = BlasInt(sw.work[1])
-    sw.work = Array(T, sw.lwork)
+    sw.work = Array{T}(sw.lwork)
     sw.liwork = sw.iwork[1]
-    sw.iwork = Array(BlasInt, sw.liwork)
+    sw.iwork = Array{BlasInt}(sw.liwork)
     sw
 end
 
