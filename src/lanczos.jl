@@ -1,3 +1,5 @@
+using Printf
+
 function exp_lanczos!{T<:Number, R<:Real}(A::LinearMap,
                                           v::AbstractVector,
                                           τ::T, m::Integer,

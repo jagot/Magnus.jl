@@ -1,6 +1,6 @@
-import Base.LinAlg.BLAS: @blasfunc
-import Base.LinAlg: BlasInt
-import Base.LinAlg.LAPACK: stegr!
+import LinearAlgebra.BLAS: @blasfunc
+import LinearAlgebra: BlasInt
+import LinearAlgebra.LAPACK: stegr!
 const liblapack = Base.liblapack_name
 
 type stegr_work{T<:Number}

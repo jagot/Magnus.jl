@@ -1,7 +1,9 @@
 using LinearMaps
 using ProgressMeter
+using Printf
 
-const cuda = if Pkg.installed("CUDArt") != nothing
+using Pkg
+const cuda = if "CUDArt" ∈ keys(Pkg.installed())
     using CUDArt
     using CUBLAS
     using CUSPARSE
