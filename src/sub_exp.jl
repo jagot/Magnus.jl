@@ -3,7 +3,7 @@ import LinearAlgebra: BlasInt
 import LinearAlgebra.LAPACK: stegr!
 const liblapack = Base.liblapack_name
 
-type stegr_work{T<:Number}
+mutable struct stegr_work{T<:Number}
     jobz::Char
     range::Char
     dv::Vector{T}
@@ -28,18 +28,18 @@ for (stegr,elty) in ((:dstegr_,:Float64),
     @eval begin
         function stegr!(n::BlasInt, sw::stegr_work{$elty})
             ldz = stride(sw.Z, 2)
-            ccall((@blasfunc($stegr), liblapack), Void,
+            ccall((@blasfunc($stegr), liblapack), Nothing,
                   (Ptr{UInt8}, Ptr{UInt8}, Ptr{BlasInt}, Ptr{$elty},
                    Ptr{$elty}, Ptr{$elty}, Ptr{$elty}, Ptr{BlasInt},
                    Ptr{BlasInt}, Ptr{$elty}, Ptr{BlasInt}, Ptr{$elty},
                    Ptr{$elty}, Ptr{BlasInt}, Ptr{BlasInt}, Ptr{$elty},
                    Ptr{BlasInt}, Ptr{BlasInt}, Ptr{BlasInt}, Ptr{BlasInt}),
-                  &sw.jobz, &sw.range, &n,
+                  Ref(sw.jobz), Ref(sw.range), Ref(n),
                   sw.dv, sw.ev,
-                  &sw.vl, &sw.vu, &sw.il, &sw.iu,
+                  Ref(sw.vl), Ref(sw.vu), Ref(sw.il), Ref(sw.iu),
                   sw.abstol, sw.m,
-                  sw.w, sw.Z, &ldz,
-                  sw.isuppz, sw.work, &sw.lwork, sw.iwork, &sw.liwork,
+                  sw.w, sw.Z, Ref(ldz),
+                  sw.isuppz, sw.work, Ref(sw.lwork), sw.iwork, Ref(sw.liwork),
                   sw.info)
         end
     end
@@ -78,9 +78,9 @@ function stegr_work(T::DataType, n::BlasInt,
     sw
 end
 
-function expT{T<:Number, R<:Real}(α::AbstractVector{R}, β::AbstractVector{R},
-                                  τ::T, v::AbstractVector{T},
-                                  sw::stegr_work{R})
+function expT(α::AbstractVector{R}, β::AbstractVector{R},
+              τ::T, v::AbstractVector{T},
+              sw::stegr_work{R}) where {T<:Number, R<:Real}
     copy!(sw.dv, α)
     copy!(sw.ev, β)
     n = BlasInt(length(α))

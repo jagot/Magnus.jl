@@ -1,18 +1,18 @@
 using Printf
 
-function exp_lanczos!{T<:Number, R<:Real}(A::LinearMap,
-                                          v::AbstractVector,
-                                          τ::T, m::Integer,
-                                          vp::AbstractVector,
-                                          V::AbstractMatrix,
-                                          α::Vector{R},
-                                          β::Vector{R},
-                                          sub_v::Vector{T},
-                                          d_sub_v::AbstractVector,
-                                          sw::stegr_work;
-                                          atol::R = 1.0e-8,
-                                          rtol::R = 1.0e-4,
-                                          verbose::Bool = false)
+function exp_lanczos!(A::LinearMap,
+                      v::AbstractVector,
+                      τ::T, m::Integer,
+                      vp::AbstractVector,
+                      V::AbstractMatrix,
+                      α::Vector{R},
+                      β::Vector{R},
+                      sub_v::Vector{T},
+                      d_sub_v::AbstractVector,
+                      sw::stegr_work;
+                      atol::R = 1.0e-8,
+                      rtol::R = 1.0e-4,
+                      verbose::Bool = false) where {T<:Number, R<:Real}
     β₀ = norm(v)
     copy!(view(V,:,1), v)
     scale!(view(V,:,1), one(T)/β₀)
@@ -47,7 +47,7 @@ function exp_lanczos!{T<:Number, R<:Real}(A::LinearMap,
     vp[:] = β₀*view(V,:,1:jj)*view(d_sub_v, 1:jj)
 end
 
-type LanczosExponentiator{T<:AbstractFloat,U<:Number} <: KrylovExponentiator
+mutable struct LanczosExponentiator{T<:AbstractFloat,U<:Number} <: KrylovExponentiator
     m::Integer
     V::AbstractMatrix
     α::Vector{T}
@@ -76,14 +76,14 @@ function LanczosExponentiator(m::Integer, v::AbstractVector;
                          T(atol), T(rtol), verbose)
 end
 
-(LE::LanczosExponentiator{T,U}){T<:AbstractFloat,U<:Number}(Ω::LinearMap, τ::U,
-                                                            v::AbstractVector, w::AbstractVector) =
-                                                                exp_lanczos!(Ω, v, τ, LE.m, w,
-                                                                             LE.V, LE.α, LE.β,
-                                                                             LE.sub_v, LE.d_sub_v,
-                                                                             LE.sw;
-                                                                             atol = LE.atol,
-                                                                             rtol = LE.rtol,
-                                                                             verbose = LE.verbose)
+(LE::LanczosExponentiator{T,U})(Ω::LinearMap, τ::U,
+                                v::AbstractVector, w::AbstractVector) where {T<:AbstractFloat,U<:Number} =
+                                    exp_lanczos!(Ω, v, τ, LE.m, w,
+                                                 LE.V, LE.α, LE.β,
+                                                 LE.sub_v, LE.d_sub_v,
+                                                 LE.sw;
+                                                 atol = LE.atol,
+                                                 rtol = LE.rtol,
+                                                 verbose = LE.verbose)
 
 export LanczosExponentiator

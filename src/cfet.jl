@@ -16,15 +16,15 @@ struct CFET4BfCPropagator{E<:Exponentiator} <: MagnusPropagator
     a::Number
     Exp::E
 end
-CFET4BfCPropagator{E<:Exponentiator}(B::LinearMap,
-                                     f::Function,
-                                     C::LinearMap,
-                                     Exp::E) =
-                                         CFET4BfCPropagator(B, f, C, 1, Exp)
+CFET4BfCPropagator(B::LinearMap,
+                   f::Function,
+                   C::LinearMap,
+                   Exp::E) where E<:Exponentiator =
+                       CFET4BfCPropagator(B, f, C, 1, Exp)
 
-function (p::CFET4BfCPropagator{E}){E<:Exponentiator,
-                                    T<:AbstractFloat}(t::T, τ::T,
-                                                      v::AbstractVector, w::AbstractVector)
+function (p::CFET4BfCPropagator{E})(t::T, τ::T,
+                                    v::AbstractVector, w::AbstractVector) where {E<:Exponentiator,
+                                                                                 T<:AbstractFloat}
     h1 = T(37/66 - 400/957*sqrt(5/3))
     h2 = T(-4/33)
     h3 = T(37/66 + 400/957*sqrt(5/3))
