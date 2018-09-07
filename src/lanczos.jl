@@ -1,3 +1,4 @@
+using LinearAlgebra
 using Printf
 
 function exp_lanczos!(A::LinearMap,
@@ -14,8 +15,8 @@ function exp_lanczos!(A::LinearMap,
                       rtol::R = 1.0e-4,
                       verbose::Bool = false) where {T<:Number, R<:Real}
     β₀ = norm(v)
-    copy!(view(V,:,1), v)
-    scale!(view(V,:,1), one(T)/β₀)
+    copyto!(view(V,:,1), v)
+    lmul!(one(T)/β₀, view(V,:,1))
 
     ε = atol + rtol * β₀
     verbose && @printf("Initial norm: β₀ %e, stopping threshold: %e\n", β₀, ε)
@@ -25,12 +26,12 @@ function exp_lanczos!(A::LinearMap,
 
     for j = 1:m
         x,y = view(V,:,j),view(V,:,j+1)
-        A_mul_B!(y,A,x)
-        α[j] = real(vecdot(x,y))
+        mul!(y,A,x)
+        α[j] = real(dot(x,y))
         j > 1 && (y .-= β[j-1]*view(V,:,j-1))
         y .-= α[j]*x
         β[j] = norm(y)
-        scale!(y, one(T)/β[j])
+        lmul!(one(T)/β[j], y)
 
         expT(view(α, 1:jj), view(β, 1:jj-1), τ, view(sub_v, 1:j), sw)
         σ = β[j]*abs(sub_v[j])
@@ -43,7 +44,7 @@ function exp_lanczos!(A::LinearMap,
         end
     end
     verbose && println("Krylov subspace size: ", jj)
-    copy!(d_sub_v, sub_v)
+    copyto!(d_sub_v, sub_v)
     vp[:] = β₀*view(V,:,1:jj)*view(d_sub_v, 1:jj)
 end
 
@@ -67,12 +68,12 @@ function LanczosExponentiator(m::Integer, v::AbstractVector;
     T = real(U)
     N = length(v)
     V = similar(v, U, N, m + 1)
-    α = Array{real(U)}(m)
-    β = Array{real(U)}(m)
-    sub_v = Array{U}(m)
+    α = Array{real(U)}(undef,m)
+    β = Array{real(U)}(undef,m)
+    sub_v = Array{U}(undef,m)
     d_sub_v = similar(v, U, m)
     LanczosExponentiator(m, V, α, β, sub_v, d_sub_v,
-                         stegr_work(real(U), BlasInt(m)),
+                         stegr_work(real(U), LinearAlgebra.BlasInt(m)),
                          T(atol), T(rtol), verbose)
 end
 

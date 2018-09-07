@@ -28,18 +28,18 @@ for (stegr,elty) in ((:dstegr_,:Float64),
     @eval begin
         function stegr!(n::BlasInt, sw::stegr_work{$elty})
             ldz = stride(sw.Z, 2)
-            ccall((@blasfunc($stegr), liblapack), Nothing,
-                  (Ptr{UInt8}, Ptr{UInt8}, Ptr{BlasInt}, Ptr{$elty},
-                   Ptr{$elty}, Ptr{$elty}, Ptr{$elty}, Ptr{BlasInt},
-                   Ptr{BlasInt}, Ptr{$elty}, Ptr{BlasInt}, Ptr{$elty},
-                   Ptr{$elty}, Ptr{BlasInt}, Ptr{BlasInt}, Ptr{$elty},
-                   Ptr{BlasInt}, Ptr{BlasInt}, Ptr{BlasInt}, Ptr{BlasInt}),
-                  Ref(sw.jobz), Ref(sw.range), Ref(n),
+            ccall((@blasfunc($stegr), liblapack), Cvoid,
+                  (Ref{UInt8}, Ref{UInt8}, Ref{BlasInt}, Ptr{$elty},
+                   Ptr{$elty}, Ref{$elty}, Ref{$elty}, Ref{BlasInt},
+                   Ref{BlasInt}, Ptr{$elty}, Ptr{BlasInt}, Ptr{$elty},
+                   Ptr{$elty}, Ref{BlasInt}, Ptr{BlasInt}, Ptr{$elty},
+                   Ref{BlasInt}, Ptr{BlasInt}, Ref{BlasInt}, Ptr{BlasInt}),
+                  sw.jobz, sw.range, n,
                   sw.dv, sw.ev,
-                  Ref(sw.vl), Ref(sw.vu), Ref(sw.il), Ref(sw.iu),
+                  sw.vl, sw.vu, sw.il, sw.iu,
                   sw.abstol, sw.m,
-                  sw.w, sw.Z, Ref(ldz),
-                  sw.isuppz, sw.work, Ref(sw.lwork), sw.iwork, Ref(sw.liwork),
+                  sw.w, sw.Z, ldz,
+                  sw.isuppz, sw.work, sw.lwork, sw.iwork, sw.liwork,
                   sw.info)
         end
     end
@@ -47,19 +47,19 @@ end
 
 function stegr_work(T::DataType, n::BlasInt,
                     jobz::Char = 'V', range::Char = 'A')
-    dv = Array{T}(n)
-    ev = Array{T}(n)
-    abstol = Array{T}(1)
-    m = Vector{BlasInt}(1)
-    w = Array{T}(n)
+    dv = Array{T}(undef, n)
+    ev = Array{T}(undef, n)
+    abstol = Array{T}(undef, 1)
+    m = Vector{BlasInt}(undef, 1)
+    w = Array{T}(undef, n)
     ldz = jobz == 'N' ? 1 : n
-    Z = Array{T}(ldz, n)
-    isuppz = Array{BlasInt}(2n)
-    work = Array{T}(1)
+    Z = Array{T}(undef, ldz, n)
+    isuppz = Array{BlasInt}(undef, 2n)
+    work = Array{T}(undef, 1)
     lwork = -one(BlasInt)
-    iwork = Array{BlasInt}(1)
+    iwork = Array{BlasInt}(undef, 1)
     liwork = -one(BlasInt)
-    info = Array{BlasInt}(1)
+    info = Array{BlasInt}(undef, 1)
     sw = stegr_work(jobz, range,
                     dv, ev,
                     0.0, 0.0,
@@ -72,17 +72,17 @@ function stegr_work(T::DataType, n::BlasInt,
                     info)
     stegr!(n, sw)
     sw.lwork = BlasInt(sw.work[1])
-    sw.work = Array{T}(sw.lwork)
+    sw.work = Array{T}(undef, sw.lwork)
     sw.liwork = sw.iwork[1]
-    sw.iwork = Array{BlasInt}(sw.liwork)
+    sw.iwork = Array{BlasInt}(undef, sw.liwork)
     sw
 end
 
 function expT(α::AbstractVector{R}, β::AbstractVector{R},
               τ::T, v::AbstractVector{T},
               sw::stegr_work{R}) where {T<:Number, R<:Real}
-    copy!(sw.dv, α)
-    copy!(sw.ev, β)
+    copyto!(sw.dv, α)
+    copyto!(sw.ev, β)
     n = BlasInt(length(α))
     stegr!(n, sw)
     for i = 1:n
