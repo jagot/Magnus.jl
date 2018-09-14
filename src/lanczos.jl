@@ -1,7 +1,7 @@
 using LinearAlgebra
 using Printf
 
-function exp_lanczos!(A::LinearMap,
+function exp_lanczos!(A::L,
                       v::AbstractVector,
                       τ::T, m::Integer,
                       vp::AbstractVector,
@@ -13,7 +13,7 @@ function exp_lanczos!(A::LinearMap,
                       sw::stegr_work;
                       atol::R = 1.0e-8,
                       rtol::R = 1.0e-4,
-                      verbose::Bool = false) where {T<:Number, R<:Real}
+                      verbose::Bool = false) where {L<:LinearMap, T<:Number, R<:Real}
     β₀ = norm(v)
     copyto!(view(V,:,1), v)
     lmul!(one(T)/β₀, view(V,:,1))
@@ -77,8 +77,8 @@ function LanczosExponentiator(m::Integer, v::AbstractVector;
                          T(atol), T(rtol), verbose)
 end
 
-(LE::LanczosExponentiator{T,U})(Ω::LinearMap, τ::U,
-                                v::AbstractVector, w::AbstractVector) where {T<:AbstractFloat,U<:Number} =
+(LE::LanczosExponentiator{T,U})(Ω::L, τ::U,
+                                v::AbstractVector, w::AbstractVector) where {L<:LinearMap, T<:AbstractFloat,U<:Number} =
                                     exp_lanczos!(Ω, v, τ, LE.m, w,
                                                  LE.V, LE.α, LE.β,
                                                  LE.sub_v, LE.d_sub_v,
