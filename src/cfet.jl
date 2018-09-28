@@ -1,5 +1,3 @@
-import Base: call
-
 #=
 
 Implementation of commutator-free exponential time propagators, as
@@ -11,23 +9,22 @@ described in
   105008. http://dx.doi.org/10.1088/1367-2630/14/10/105008
 
 =#
-type CFET4BfCPropagator{E<:Exponentiator} <: MagnusPropagator
-    B::LinOp
+struct CFET4BfCPropagator{E<:Exponentiator} <: MagnusPropagator
+    B::LinearMap
     f::Function
-    C::LinOp
+    C::LinearMap
     a::Number
     Exp::E
 end
-CFET4BfCPropagator{E<:Exponentiator}(B::LinOp,
-                                     f::Function,
-                                     C::LinOp,
-                                     Exp::E) =
-                                         CFET4BfCPropagator(B, f, C, 1, Exp)
+CFET4BfCPropagator(B::LinearMap,
+                   f::Function,
+                   C::LinearMap,
+                   Exp::E) where E<:Exponentiator =
+                       CFET4BfCPropagator(B, f, C, 1, Exp)
 
-function call{E<:Exponentiator,
-              T<:AbstractFloat}(p::CFET4BfCPropagator{E},
-                                t::T, τ::T,
-                                v::KindOfVector, w::KindOfVector)
+function (p::CFET4BfCPropagator{E})(t::T, τ::T,
+                                    v::AbstractVector, w::AbstractVector) where {E<:Exponentiator,
+                                                                                 T<:AbstractFloat}
     h1 = T(37/66 - 400/957*sqrt(5/3))
     h2 = T(-4/33)
     h3 = T(37/66 + 400/957*sqrt(5/3))

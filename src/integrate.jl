@@ -1,7 +1,9 @@
-using LinOps
+using LinearMaps
 using ProgressMeter
+using Printf
 
-const cuda = if Pkg.installed("CUDArt") != nothing
+using Pkg
+const cuda = if "CUDArt" ∈ keys(Pkg.installed())
     using CUDArt
     using CUBLAS
     using CUSPARSE
@@ -22,24 +24,24 @@ function SI(v, base = 1000)
 end
 
 function integrate(observe::Function,
-                   v₀::KindOfVector,
+                   v₀::AbstractVector,
                    tmax::Number, steps::Integer,
                    propagator::MagnusPropagator;
                    save_intermediate::Bool = false,
                    verbose::Bool = false)
     τ = tmax/steps
     V = similar(v₀, eltype(v₀), length(v₀), save_intermediate ? steps + 1 : 1)
-    copy!(sub(V, :, 1), v₀)
+    copy!(view(V, :, 1), v₀)
     cur = 1
     next = save_intermediate ? 2 : 1
     verbose && println("$(typeof(propagator))")
     prog = Progress(steps, 0.1, "Integrating ")
     tic()
     for i = 1:steps
-        propagator((i-1)*τ, τ, sub(V, :, cur), sub(V, :, next))
+        propagator((i-1)*τ, τ, view(V, :, cur), view(V, :, next))
 
         cur = next
-        observe(sub(V, :, next), i, τ)
+        observe(view(V, :, next), i, τ)
         save_intermediate && (next += 1)
         verbose && ProgressMeter.update!(prog, i)
     end
@@ -50,7 +52,7 @@ function integrate(observe::Function,
          :performance => length(v₀)*steps/ms)
 end
 
-integrate(v₀::KindOfVector,
+integrate(v₀::AbstractVector,
           tmax::Number, steps::Integer,
           propagator::MagnusPropagator;
           save_intermediate::Bool = false,
@@ -62,11 +64,11 @@ integrate(v₀::KindOfVector,
                         verbose = verbose)
 
 function integrate(observe::Function,
-                   v₀::KindOfVector,
+                   v₀::AbstractVector,
                    tmax::Number, steps::Integer,
-                   B::KindOfMatrix,
+                   B::AbstractMatrix,
                    f::Function,
-                   C::KindOfMatrix,
+                   C::AbstractMatrix,
                    a::Number = 1;
                    propagator = :cfet,
                    exponentiator = :lanczos,
@@ -82,8 +84,8 @@ function integrate(observe::Function,
         C = upload(C)
     end
 
-    B = LinOp(B)
-    C = LinOp(C)
+    B = LinearMap(B)
+    C = LinearMap(C)
 
     Exp = if exponentiator == :lanczos
         LanczosExponentiator(lanczos_m, v₀)
@@ -113,11 +115,11 @@ function integrate(observe::Function,
     end
 end
 
-integrate(v₀::KindOfVector,
+integrate(v₀::AbstractVector,
           tmax::Number, steps::Integer,
-          B::KindOfMatrix,
+          B::AbstractMatrix,
           f::Function,
-          C::KindOfMatrix,
+          C::AbstractMatrix,
           a::Number = 1;
           propagator = :cfet,
           exponentiator = :lanczos,

@@ -1,19 +1,14 @@
-KindOfVector = LinOps.KindOfVector
-KindOfMatrix = LinOps.KindOfMatrix
-
-type ScalarExponentiator <: Exponentiator
+mutable struct ScalarExponentiator <: Exponentiator
 end
-function ScalarExponentiator(v::KindOfVector)
+function ScalarExponentiator(v::AbstractVector)
     size(v,1) == 1 || error("Scalar exponentiator only applicable for 1×1 operators")
     ScalarExponentiator()
 end
 
-import Base: call
-function call{T<:Number}(SE::ScalarExponentiator,
-                         Ω::LinOp{T}, τ::Number,
-                         v, w)
+function (SE::ScalarExponentiator)(Ω::LinearMap{T}, τ::Number,
+                                   v, w) where T<:Number
     a = Ω([one(T)])[1]
     w[:] = exp(τ*a)*v
 end
 
-export ScalarExponentiator, call
+export ScalarExponentiator

@@ -1,0 +1,14 @@
+name = "Magnus"
+uuid = "ff7f6b4a-fd9c-50c9-8e10-8bfd8779e90d"
+authors = ["Stefanos Carlström <stefanos.carlstrom@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+LinearMaps = "7a12625a-238d-50fd-b39a-03d52299707e"
+LinearOperators = "5c8ed15e-5a4c-59e4-a42b-c7e8811fb125"
+Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+PolynomialOperators = "88d0e30e-9bf2-11e8-110a-078b1f1acb7c"
+Polynomials = "f27b6e38-b328-58d1-80ce-0feddd5e7a45"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
