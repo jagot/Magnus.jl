@@ -3,9 +3,9 @@ uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
 [[Compat]]
 deps = ["Base64", "Dates", "DelimitedFiles", "Distributed", "InteractiveUtils", "LibGit2", "Libdl", "LinearAlgebra", "Markdown", "Mmap", "Pkg", "Printf", "REPL", "Random", "Serialization", "SharedArrays", "Sockets", "SparseArrays", "Statistics", "Test", "UUIDs", "Unicode"]
-git-tree-sha1 = "277d3807440d9793421354b6680911fc95d91a84"
+git-tree-sha1 = "ff2595695fc4f14427358ce2593f867085c45dcb"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "1.0.1"
+version = "1.2.0"
 
 [[Dates]]
 deps = ["Printf"]
@@ -19,15 +19,21 @@ uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 deps = ["LinearAlgebra", "Random", "Serialization", "Sockets"]
 uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
+[[FastClosures]]
+deps = ["Compat"]
+git-tree-sha1 = "ab31392bbdd4f7c254fbeab8fe9ee470fe5e5f7c"
+uuid = "9aa1b823-49e4-5ca5-8b0f-3971ec8bab6a"
+version = "0.2.0"
+
 [[InteractiveUtils]]
 deps = ["LinearAlgebra", "Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 
 [[IterativeSolvers]]
-deps = ["LinearAlgebra", "Printf", "Random", "RecipesBase", "SparseArrays", "Test"]
-git-tree-sha1 = "70938c0d6a18fe4734c695cc18e477e08dc72942"
+deps = ["LinearAlgebra", "Pkg", "Printf", "Random", "RecipesBase", "SparseArrays", "Test"]
+git-tree-sha1 = "a7b8056ecd43aa0d112d4b5d04180194d12c3c62"
 uuid = "42fd0dbc-a981-5370-80f2-aaf504508153"
-version = "0.7.0"
+version = "0.7.1"
 
 [[LibGit2]]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
@@ -41,15 +47,15 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [[LinearMaps]]
 deps = ["LinearAlgebra", "SparseArrays", "Test"]
-git-tree-sha1 = "3685dd10180eb53fc5a40fcb3def3d4506dc8ba5"
+git-tree-sha1 = "c5b4fb2d2b47cce577ea9240066c2fe4c26bf121"
 uuid = "7a12625a-238d-50fd-b39a-03d52299707e"
-version = "2.1.0"
+version = "2.2.0"
 
 [[LinearOperators]]
-deps = ["Compat", "LinearAlgebra"]
-git-tree-sha1 = "f03488a6426d8169a2810f6deccb2ead21866402"
+deps = ["FastClosures", "InteractiveUtils", "LinearAlgebra", "Pkg", "Printf", "SparseArrays", "Test"]
+git-tree-sha1 = "c689db7bff10361897c3e66c779d8fb184c013d5"
 uuid = "5c8ed15e-5a4c-59e4-a42b-c7e8811fb125"
-version = "0.4.1"
+version = "0.5.0"
 
 [[Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
@@ -75,19 +81,19 @@ version = "0.1.0"
 
 [[Polynomials]]
 deps = ["LinearAlgebra", "SparseArrays", "Test"]
-git-tree-sha1 = "af883752c4935425a3ab30031a2069254c451b8b"
+git-tree-sha1 = "1a1eae52956658a6acae6fa1b6d6c3d488192895"
 uuid = "f27b6e38-b328-58d1-80ce-0feddd5e7a45"
-version = "0.5.0"
+version = "0.5.1"
 
 [[Printf]]
 deps = ["Unicode"]
 uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 
 [[ProgressMeter]]
-deps = ["Compat"]
-git-tree-sha1 = "30d3473425cdb13b23ff10dfc7727be8bcc2871a"
+deps = ["Printf", "Random", "Test"]
+git-tree-sha1 = "09e653f4b0a3c44628f0bdd0a0e58bc92e0264ef"
 uuid = "92933f4c-e287-5a05-a399-4b506db050ca"
-version = "0.5.6"
+version = "0.6.0"
 
 [[REPL]]
 deps = ["InteractiveUtils", "Markdown", "Sockets"]
@@ -98,16 +104,10 @@ deps = ["Serialization"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [[RecipesBase]]
-deps = ["Random", "Test"]
-git-tree-sha1 = "298e774bc0fd26b7011358fc9ff0223b4e81aaa6"
+deps = ["Pkg", "Random", "Test"]
+git-tree-sha1 = "b18c3d875ad6805e3db59c4e81f206f04df71d66"
 uuid = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
-version = "0.4.0"
-
-[[Requires]]
-deps = ["Test"]
-git-tree-sha1 = "f6fbf4ba64d295e146e49e021207993b6b48c7d1"
-uuid = "ae029012-a4dd-5104-9daa-d747884805df"
-version = "0.5.2"
+version = "0.5.0"
 
 [[SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
