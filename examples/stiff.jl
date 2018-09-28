@@ -1,4 +1,4 @@
-using LinOps
+using LinearMaps
 using Magnus
 
 using PyCall
@@ -10,10 +10,8 @@ include("plot_convergence.jl")
 type ExpEulerExponentiator <: Magnus.Exponentiator
 end
 
-import Base: call
-function call{T<:Number}(SE::ExpEulerExponentiator,
-                         Ω::LinOp{T}, τ::Number,
-                         v, w)
+function (SE::ExpEulerExponentiator)(Ω::LinearMap{T}, τ::Number,
+                                     v, w) where T<:Number
     a = Ω(v)
     w[:] = v + τ*a
 end
@@ -35,7 +33,7 @@ function test_stiff(A,y0,y_exact,tmax,N,name,
     Exps = [Exp_objs[e] for e in Exps]
 
     for (Exp,label) in Exps
-        prop = MidpointPropagator(t -> LinOp(A), Exp)
+        prop = MidpointPropagator(t -> LinearMap(A), Exp)
 
         y = vec(integrate(y0, tmax, N, prop, save_intermediate = true))
 
@@ -75,7 +73,7 @@ if Pkg.installed("LambertW") != nothing
     y = t -> 1./(lambertw(a*exp(a-t)) + 1)
     # Technically not a linear operator, but, hey.
     # See http://mathworks.com/company/newsletters/articles/stiff-differential-equations.html
-    fireball = LinOp{Float64}((y,x,α,β) -> y[:] = α*(x.^2 - x.^3))
+    fireball = LinearMap{Float64}((y,x,α,β) -> y[:] = α*(x.^2 - x.^3))
     test_stiff(fireball, [δ], y, 1./δ, 200, "Fireball, half interval",
                [:exp_euler], 0, 4)
     test_stiff(fireball, [δ], y, 2./δ, 200, "Fireball, full interval",

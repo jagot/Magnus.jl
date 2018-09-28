@@ -1,4 +1,4 @@
-using LinOps
+using LinearMaps
 using Magnus
 using PyPlot
 
@@ -14,7 +14,7 @@ tmax = π
 N = 200
 
 t = linspace(0,tmax,N+1)
-y = exp(-(b*t - (cos(ω*t)-1)/ω * c))*y0[1]
+y = exp.(-(b*t - (cos.(ω*t)-1)/ω * c))*y0[1]
 
 function plot_approx(t_approx,y_approx,subs,label)
     st = length(t_approx) > 100 ? "-" : ".-"
@@ -25,8 +25,8 @@ function plot_approx(t_approx,y_approx,subs,label)
 end
 
 Exp = ScalarExponentiator(y0)
-midpoint = MidpointPropagator(t -> LinOp(b + f(t)*c), -1, Exp)
-cfet = CFET4BfCPropagator(LinOp(b), f, LinOp(c), -1, Exp)
+midpoint = MidpointPropagator(t -> LinearMap(b + f(t)*c), -1, Exp)
+cfet = CFET4BfCPropagator(LinearMap(b), f, LinearMap(c), -1, Exp)
 
 figure("scalar",figsize=(10,14))
 clf()
